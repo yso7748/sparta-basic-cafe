@@ -1,17 +1,18 @@
-var express = require('express');
-var router = express.Router();
+import express from 'express';
+const router = express.Router();
 
 /* GET users listing. */
-router.get('/stats', function (req, res, next) {
+router.get('/stats', (req, res, next) => {
     res.status(200).json({
         stats: {
             totalMenus: 3,
             totalOrders: 10,
             totalSales: 30000
         }
-    })
+    });
 });
-router.get('/', function (req, res, next) {
+
+router.get('/', (req, res, next) => {
     res.status(200).json({
         menus: [
             {
@@ -31,7 +32,7 @@ router.get('/', function (req, res, next) {
                 totalOrders: 10
             }
         ]
-    })
+    });
 });
 
-module.exports = router;
+export default router;
