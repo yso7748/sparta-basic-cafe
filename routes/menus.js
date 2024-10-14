@@ -1,7 +1,6 @@
 import express from 'express';
 const router = express.Router();
 
-/* GET users listing. */
 router.get('/stats', (req, res, next) => {
     res.status(200).json({
         stats: {
