@@ -1,37 +1,46 @@
-import express from 'express';
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+
 const router = express.Router();
 
-router.get('/stats', (req, res, next) => {
-    res.status(200).json({
-        stats: {
-            totalMenus: 3,
-            totalOrders: 10,
-            totalSales: 30000
-        }
-    });
+export const prisma = new PrismaClient({
+  log: ["query", "info", "warn", "error"],
+  errorFormat: "pretty",
 });
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        menus: [
-            {
-                id: 1,
-                name: 'Latte',
-                type: 'Coffee',
-                temperature: 'hot',
-                price: 4500,
-                totalOrders: 5
-            },
-            {
-                id: 2,
-                name: 'Iced Tea',
-                type: 'Tea',
-                temperature: 'ice',
-                price: 3000,
-                totalOrders: 10
-            }
-        ]
+router.get("/stats", async (req, res, next) => {
+  const menus = await prisma.menu.findMany();
+  const orders = await prisma.orderhistory.findMany();
+
+  let totalOrders = 0;
+  let totalSales = 0;
+  for (let i = 0; i < orders.length; i++) {
+    totalOrders += orders[i].quantity;
+
+    // const menuInfo = await prisma.menu.findFirst({ where: { id: orders[i].menu_id } });
+
+    const menuInfo = menus.find((menu) => {
+      return menu.id === orders[i].menu_id;
     });
+    console.log(menuInfo);
+
+    totalSales += menuInfo.price * orders[i].quantity;
+  }
+  console.log("totalSales", totalSales);
+  res.status(200).json({
+    stats: {
+      totalMenus: menus.length,
+      totalOrders: totalOrders,
+      totalSales: totalSales,
+    },
+  });
+});
+
+router.get("/", async (req, res, next) => {
+  const menus = await prisma.menu.findMany();
+  console.log(menus);
+
+  return res.status(200).json({ menus });
 });
 
 export default router;

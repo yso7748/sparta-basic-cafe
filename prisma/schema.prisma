@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model menu {
+  id           Int            @id @default(autoincrement())
+  name         String        @db.VarChar(255)
+  type         String?        @db.VarChar(255)
+  temperature  String?        @db.VarChar(255)
+  price        Int?
+  orderhistory orderhistory[]
+}
+
+model orderhistory {
+  order_id    Int    @id @default(autoincrement())
+  menu_id     Int
+  quantity    Int?
+  menu       menu   @relation(fields: [menu_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_order_menu")
+
+  @@index([menu_id], map: "FK_order_menu")
+}
